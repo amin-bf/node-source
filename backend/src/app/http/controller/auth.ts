@@ -1,59 +1,68 @@
-import { randomBytes } from "crypto"
+import { NextFunction, Request, Response } from "express"
 
-import { Request, Response } from "express"
+import { User } from "../../models/user"
 
-const users: { id: string; username: string; password: string }[] = []
-
-export const register = (req: Request, res: Response) => {
+export const register = async (req: Request, res: Response) => {
   const { username, password } = req.body
 
-  const id = randomBytes(4).toString("hex")
-
-  users.push({
+  const user = User.build({
     username,
-    password,
-    id
+    password
   })
 
-  console.table(users)
+  await user.save()
+
+  console.log(user)
   res.json({ message: "user Created!" })
 }
 
-export const list = (req: Request, res: Response) => {
+export const list = async (req: Request, res: Response) => {
+  const users = await User.find()
   res.json(users)
 }
 
-export const modify = (req: Request, res: Response) => {
+export const modify = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const userId = req.params.id
 
-  const existingUser = users.find(user => {
-    return user.id === userId
-  })
+  const existingUser = await User.findById(userId)
 
-  if (!existingUser) throw new Error("user not found")
+  if (!existingUser) {
+    const error = new Error("user not found")
+    next(error)
+    return
+  }
 
   const { username, password } = req.body
 
-  existingUser.username = username
-  existingUser.password = password
+  existingUser.set("username", username)
+  existingUser.set("password", password)
+
+  await existingUser.save()
+
   res.json(existingUser)
 }
 
-export const deleteUser = (req: Request, res: Response) => {
-  console.log("Deleting user")
-
+export const deleteUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const userId = req.params.id
-  console.log(userId)
 
-  const index = users.findIndex(user => {
-    return user.id === userId
-  })
+  const existingUser = await User.findById(userId)
 
-  if (index < 0) throw new Error("user not found")
+  if (!existingUser) {
+    const error = new Error("user not found")
+    next(error)
+    return
+  }
   console.log("Found")
 
-  users.splice(index, 1)
-  console.log(users)
+  await existingUser.delete()
 
   res.json({ message: "User Deleted!" })
 }
