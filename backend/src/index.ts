@@ -7,6 +7,8 @@ import { dbConnection } from "./util/database"
 import { currentUser } from "./app/http/middleware/current-user"
 import { errorHandler } from "./app/http/middleware/error-handler"
 
+import "./app/models/role"
+
 const app = express()
 app.use(express.json())
 app.use(

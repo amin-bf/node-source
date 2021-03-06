@@ -12,14 +12,6 @@ export const register = async (
   res: Response,
   next: NextFunction
 ) => {
-  const errors = validationResult(req)
-
-  if (!errors.isEmpty()) {
-    throw new RequestValidationError(errors.array())
-  }
-
-  console.log(typeof errors.array()[0])
-
   const { username, password } = req.body
 
   const user = User.build({
@@ -43,7 +35,7 @@ export const register = async (
 }
 
 export const list = async (req: Request, res: Response) => {
-  const users = await User.find()
+  const users = await User.find().populate("roles")
   res.status(201).json(users)
 }
 

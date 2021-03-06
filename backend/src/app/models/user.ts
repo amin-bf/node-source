@@ -1,15 +1,18 @@
 import mongoose from "mongoose"
 
 import { Password } from "../../util/password"
+import { IRoleDoc } from "./role"
 
 interface IUserAttrs {
   username: string
   password: string
+  roles?: string[]
 }
 
 interface IUserDoc extends mongoose.Document {
   username: string
   password: string
+  roles: IRoleDoc[]
 }
 
 interface IUserModel extends mongoose.Model<IUserDoc> {
@@ -26,7 +29,8 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true
-    }
+    },
+    roles: [{ type: mongoose.Types.ObjectId, ref: "Role" }]
   },
   {
     toJSON: {

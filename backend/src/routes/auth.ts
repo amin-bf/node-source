@@ -10,6 +10,8 @@ import {
   login
 } from "../app/http/controller/auth"
 import { requireAuth } from "../app/http/middleware/require-auth"
+import { RegisterRequest } from "../app/http/request/auth/register-request"
+import { permission } from "../util/access-management"
 
 const router = Router()
 
@@ -19,18 +21,8 @@ router.delete("/api/users/:id", deleteUser)
 
 router.post(
   "/api/auth/register",
-  [
-    body("username")
-      .trim()
-      .not()
-      .isEmpty()
-      .withMessage("Username field in compulsory!"),
-    body("password")
-      .trim()
-      .not()
-      .isEmpty()
-      .withMessage("Password field in compulsory!")
-  ],
+  permission("user.viewAny"),
+  RegisterRequest.getChain(),
   register
 )
 router.get("/api/auth/current", currentUser)
