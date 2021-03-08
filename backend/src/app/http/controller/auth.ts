@@ -48,7 +48,7 @@ export const login = async (
 
   const existingUser = await User.findOne({
     username
-  })
+  }).populate("roles")
 
   if (!existingUser) {
     throw new Error("Invalid Credentials")
@@ -63,7 +63,8 @@ export const login = async (
   const token = jwt.sign(
     {
       id: existingUser.id,
-      username: existingUser.username
+      username: existingUser.username,
+      roles: existingUser.roles
     },
     "hjfgHGyu^75(*hJghjhFGfjgf"
   )

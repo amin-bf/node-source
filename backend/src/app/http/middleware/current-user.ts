@@ -1,10 +1,12 @@
 import { Response, Request, NextFunction } from "express"
 import jwt from "jsonwebtoken"
+import { IRoleDoc } from "../../models/role"
 
 interface IUserPayload {
   id: string
   username: string
   iat: string
+  roles?: IRoleDoc[]
 }
 
 declare global {
